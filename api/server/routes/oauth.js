@@ -36,6 +36,7 @@ router.get(
   passport.authenticate('google', {
     scope: ['openid', 'profile', 'email'],
     session: false,
+    prompt: process.env.GOOGLE_PROMPT,
   }),
 );
 
