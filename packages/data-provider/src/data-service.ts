@@ -74,6 +74,15 @@ export function updateMessage(payload: t.TUpdateMessageRequest): Promise<unknown
   return request.put(endpoints.messages(conversationId, messageId), { text });
 }
 
+export function updateMessageContent(payload: t.TUpdateMessageContent): Promise<unknown> {
+  const { conversationId, messageId, index, text } = payload;
+  if (!conversationId) {
+    throw new Error('conversationId is required');
+  }
+
+  return request.put(endpoints.messages(conversationId, messageId), { text, index });
+}
+
 export function updateUserKey(payload: t.TUpdateUserKeyRequest) {
   const { value } = payload;
   if (!value) {
@@ -473,13 +482,23 @@ export const getFileDownload = async (userId: string, file_id: string): Promise<
   });
 };
 
-export const deleteFiles = async (
-  files: f.BatchFile[],
-  assistant_id?: string,
-  tool_resource?: a.EToolResources,
-): Promise<f.DeleteFilesResponse> =>
+export const getCodeOutputDownload = async (url: string): Promise<AxiosResponse> => {
+  return request.getResponse(url, {
+    responseType: 'blob',
+    headers: {
+      Accept: 'application/octet-stream',
+    },
+  });
+};
+
+export const deleteFiles = async (payload: {
+  files: f.BatchFile[];
+  agent_id?: string;
+  assistant_id?: string;
+  tool_resource?: a.EToolResources;
+}): Promise<f.DeleteFilesResponse> =>
   request.deleteWithOptions(endpoints.files(), {
-    data: { files, assistant_id, tool_resource },
+    data: payload,
   });
 
 /* Speech */
@@ -681,4 +700,8 @@ export function getUserTerms(): Promise<t.TUserTermsResponse> {
 
 export function acceptTerms(): Promise<t.TAcceptTermsResponse> {
   return request.post(endpoints.acceptUserTerms());
+}
+
+export function getBanner(): Promise<t.TBannerResponse> {
+  return request.get(endpoints.banner());
 }

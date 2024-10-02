@@ -1,6 +1,5 @@
+import { Feather } from 'lucide-react';
 import { EModelEndpoint, alternateName } from 'librechat-data-provider';
-import { BrainCircuit } from 'lucide-react';
-import UnknownIcon from '~/components/Chat/Menus/Endpoints/UnknownIcon';
 import {
   AzureMinimalIcon,
   OpenAIMinimalIcon,
@@ -13,11 +12,12 @@ import {
   BedrockIcon,
   Sparkles,
 } from '~/components/svg';
-import { cn } from '~/utils';
+import UnknownIcon from '~/components/Chat/Menus/Endpoints/UnknownIcon';
 import { IconProps } from '~/common';
+import { cn } from '~/utils';
 
 const MinimalIcon: React.FC<IconProps> = (props) => {
-  const { size = 30, iconClassName, error } = props;
+  const { size = 30, iconURL = '', iconClassName, error } = props;
 
   let endpoint = 'default'; // Default value for endpoint
 
@@ -49,7 +49,7 @@ const MinimalIcon: React.FC<IconProps> = (props) => {
     [EModelEndpoint.assistants]: { icon: <Sparkles className="icon-sm" />, name: 'Assistant' },
     [EModelEndpoint.azureAssistants]: { icon: <Sparkles className="icon-sm" />, name: 'Assistant' },
     [EModelEndpoint.agents]: {
-      icon: <BrainCircuit className="icon-sm" />,
+      icon: <Feather className="icon-sm" />,
       name: props.modelLabel ?? alternateName[EModelEndpoint.agents],
     },
     [EModelEndpoint.bedrock]: {
@@ -57,21 +57,14 @@ const MinimalIcon: React.FC<IconProps> = (props) => {
       name: props.modelLabel ?? alternateName[EModelEndpoint.bedrock],
     },
     default: {
-      icon: (
-        <UnknownIcon
-          iconURL={props.iconURL}
-          endpoint={endpoint}
-          className="icon-sm"
-          context="nav"
-        />
-      ),
+      icon: <UnknownIcon iconURL={iconURL} endpoint={endpoint} className="icon-sm" context="nav" />,
       name: endpoint,
     },
   };
 
   let { icon, name } = endpointIcons[endpoint] ?? endpointIcons.default;
-  if (props.iconURL && endpointIcons[props.iconURL]) {
-    ({ icon, name } = endpointIcons[props.iconURL]);
+  if (iconURL && endpointIcons[iconURL] != null) {
+    ({ icon, name } = endpointIcons[iconURL]);
   }
 
   return (
@@ -83,13 +76,13 @@ const MinimalIcon: React.FC<IconProps> = (props) => {
         height: size,
       }}
       className={cn(
-        'relative flex items-center justify-center rounded-sm text-black dark:text-white',
+        'relative flex items-center justify-center rounded-sm text-text-secondary',
         props.className ?? '',
       )}
     >
       {icon}
       {error === true && (
-        <span className="absolute right-0 top-[20px] -mr-2 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-red-500 text-[10px] text-black dark:text-white">
+        <span className="absolute right-0 top-[20px] -mr-2 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-red-500 text-[10px] text-text-secondary">
           !
         </span>
       )}
