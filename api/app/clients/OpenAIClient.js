@@ -842,27 +842,27 @@ class OpenAIClient extends BaseClient {
     }
 
     const titleChatCompletion = async () => {
-      modelOptions.model = model;
+      try {
+        modelOptions.model = model;
 
-      if (this.azure) {
-        modelOptions.model = process.env.AZURE_OPENAI_DEFAULT_MODEL ?? modelOptions.model;
-        this.azureEndpoint = genAzureChatCompletion(this.azure, modelOptions.model, this);
-      }
+        if (this.azure) {
+          modelOptions.model = process.env.AZURE_OPENAI_DEFAULT_MODEL ?? modelOptions.model;
+          this.azureEndpoint = genAzureChatCompletion(this.azure, modelOptions.model, this);
+        }
 
-      const instructionsPayload = [
-        {
-          role: this.options.titleMessageRole ?? (this.isOllama ? 'user' : 'system'),
-          content: `Please generate ${titleInstruction}
+        const instructionsPayload = [
+          {
+            role: this.options.titleMessageRole ?? (this.isOllama ? 'user' : 'system'),
+            content: `Please generate ${titleInstruction}
 
 ${convo}
 
 ||>Title:`,
-        },
-      ];
+          },
+        ];
 
-      const promptTokens = this.getTokenCountForMessage(instructionsPayload[0]);
+        const promptTokens = this.getTokenCountForMessage(instructionsPayload[0]);
 
-      try {
         let useChatCompletion = true;
 
         if (this.options.reverseProxyUrl === CohereConstants.API_URL) {
@@ -1309,7 +1309,7 @@ ${convo}
       /** @type {(value: void | PromiseLike<void>) => void} */
       let streamResolve;
 
-      if (modelOptions.stream && /\bo1\b/i.test(modelOptions.model)) {
+      if (modelOptions.stream && this.isO1Model) {
         delete modelOptions.stream;
         delete modelOptions.stop;
       }
